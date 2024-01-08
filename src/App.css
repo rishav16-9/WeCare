@@ -1,4 +1,10 @@
-.App {
+.formsk{
+  align-items: center;
+  align-content: center;
+  text-align: -webkit-center;
+}
+
+/* .App {
   text-align: center;
 }
 
@@ -35,4 +41,4 @@
   to {
     transform: rotate(360deg);
   }
-}
+} */
