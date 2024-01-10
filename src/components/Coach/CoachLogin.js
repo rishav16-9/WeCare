@@ -27,15 +27,11 @@ const CoachLogin = () => {
       setPassFlag(true);
     } else {
       axios
-        .get(
-          "http://localhost:5000/coaches/login?id=" + id + "&password=" + pwd
+        .post(
+          `http://localhost:5000/coaches/login?coachId=${id}&password=${pwd}`
         )
         .then((res) => {
-          if (res.data.length === 0) {
-            setState(true);
-          } else {
-            navigate("/coachhome");
-          }
+          navigate("/coachhome");
         });
     }
   };
