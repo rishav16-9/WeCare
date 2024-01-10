@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
-// import "../App.css/";
+import coachicon from "../../images/coach_icon.png";
 import { useNavigate } from "react-router-dom";
 const CoachLogin = () => {
   let navigate = useNavigate();
@@ -41,39 +41,42 @@ const CoachLogin = () => {
   };
   return (
     <>
-      <form onSubmit={handleLogin} className="formsk">
-        <br />
-        <h2>Login</h2>
-        <br />
-        <div className="form-group">
-          <label>Coach Id:</label>
-          <input
-            type="text"
-            style={{ width: "40%" }}
-            className="form-control"
-            onChange={hadleIdChange}
-            placeholder="UserName"
-          />
-          <br />
-          <br />
+      <div className="container mt-3">
+        <div className="h-100 d-flex align-items-center justify-content-center">
+          <div className="bg-black text-white p-4" style={{ width: "30rem" }}>
+            <img src={coachicon} alt="User" className="px-3" />
+            <span style={{ fontSize: "25px" }}>Login As Coach</span>
+            <form onSubmit={handleLogin} className="pt-2">
+              <input
+                style={{ width: "100%" }}
+                type="text"
+                className="form-control"
+                onChange={hadleIdChange}
+                placeholder="Coach Id"
+              />
+              <br />
+              <input
+                style={{ width: "100%" }}
+                type="password"
+                className="form-control"
+                onChange={hadlePassChange}
+                placeholder="Password"
+              />
+              <br />
+              <span className="text-danger">{message}</span>
+            </form>
+            <div className="d-flex justify-content-center">
+              <button
+                type="submit"
+                className="btn btn-primary"
+                onClick={handleLogin}
+              >
+                Login
+              </button>
+            </div>
+          </div>
         </div>
-        <div className="form-group">
-          <label>Password:</label>
-          <input
-            type="password"
-            style={{ width: "40%" }}
-            onChange={hadlePassChange}
-            className="form-control"
-            placeholder="Password"
-          />
-          <br />
-          <br />
-        </div>
-        <div className="text-danger">{message}</div>
-        <button type="submit" className="btn btn-primary">
-          Login
-        </button>
-      </form>
+      </div>
     </>
   );
 };
