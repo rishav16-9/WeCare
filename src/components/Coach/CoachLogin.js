@@ -3,6 +3,7 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import coachicon from "../../images/coach_icon.png";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../Navbar";
 const CoachLogin = () => {
   let navigate = useNavigate();
   const [id, setId] = useState("");
@@ -31,7 +32,8 @@ const CoachLogin = () => {
           `http://localhost:5000/coaches/login?coachId=${id}&password=${pwd}`
         )
         .then((res) => {
-          navigate("/coachhome");
+          localStorage.setItem("id", id);
+          navigate("/coachhome/" + id);
         });
     }
   };

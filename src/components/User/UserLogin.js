@@ -28,7 +28,7 @@ const UserLogin = () => {
       setPassFlag(true);
     } else {
       axios
-        .get("  http://localhost:4000/users?id=" + id + "&password" + pwd)
+        .get("http://localhost:4000/users?id=" + id + "&password" + pwd)
         .then((res) => {
           if (res.data.length === 0) {
             setState(true);

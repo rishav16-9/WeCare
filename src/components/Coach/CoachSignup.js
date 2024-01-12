@@ -69,7 +69,6 @@ const CoachSignup = () => {
           },
         })
         .then((res) => {
-          console.log(res);
           setSuccess(true);
         })
         .catch((e) => {

@@ -1,13 +1,10 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-export default function CoachHome() {
+const CoachSchedule = () => {
   let params = useParams();
   let success;
-  const [data, setData] = useState("");
   useEffect(() => {
-    setData(localStorage.getItem("id"));
     axios
       .get(`http://localhost:5000/coaches/booking/${params.id}`)
       .then((res) => {
@@ -17,7 +14,7 @@ export default function CoachHome() {
           success = false;
         }
       });
-  }, [data]);
+  }, []);
   return (
     <>
       {success ? (
@@ -39,4 +36,6 @@ export default function CoachHome() {
       )}
     </>
   );
-}
+};
+
+export default CoachSchedule;
