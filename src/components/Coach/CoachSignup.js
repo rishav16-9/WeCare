@@ -1,39 +1,78 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import coachicon from "../../images/coach_icon.png";
 
 const CoachSignup = () => {
   let navigate = useNavigate();
-  const [inputs, setInputs] = useState({
+  const initialValue = {
     name: "",
     password: "",
-    mobileNumber: "",
     dateOfBirth: "",
+    gender: "",
+    mobileNumber: "",
     speciality: "",
-  });
-  const [id, setId] = useState("");
+  };
+  const [formValues, setFormValues] = useState(initialValue);
+  const [formErrors, setFormErrors] = useState({});
+  const [isSubmit, setIsSubmit] = useState(false);
+  const [cId, setCId] = useState("");
 
-  const [state, setState] = useState({
-    nameFlag: false,
-    passFlag: false,
-    mobileFlag: false,
-    specFlag: false,
-    ageFlag: false,
-  });
-
-  const [success, setSuccess] = useState(false);
-
-  const handleChange = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
-    setInputs((values) => ({ ...values, [name]: value }));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues({ ...formValues, [name]: value });
   };
 
-  // const handleChangeSpec = (e) => {
-  //     const value = e.target.value
-  // }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setFormErrors(validate(formValues));
+    const newCoach = formValues;
+    axios
+      .post("http://localhost:5000/coaches", newCoach, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((res) => {
+        setCId(res.data.message);
+        setIsSubmit(true);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
+  useEffect(() => {
+    if (Object.keys(formErrors).length === 0 && isSubmit) {
+    }
+  }, [formValues]);
+
+  const validate = (values) => {
+    const errors = {};
+    if (!values.name) {
+      errors.name = "Name is required";
+    }
+    if (!values.password) {
+      errors.password = "Password is required";
+    }
+    if (!values.dateOfBirth) {
+      errors.dateOfBirth = "Date of birth is required";
+    }
+    if (getAge(values.dateOfBirth) < 18 || getAge(values.dateOfBirth) > 100) {
+      errors.dateOfBirth = "To register must be greater than 18";
+    }
+    if (!values.gender) {
+      errors.gender = "Gender is required";
+    }
+    if (!values.mobileNumber) {
+      errors.mobileNumber = "Mobile number is required";
+    }
+    if (!values.speciality) {
+      errors.speciality = "Speciality is required";
+    }
+    return errors;
+  };
 
   let getAge = (dateString) => {
     var today = new Date();
@@ -45,47 +84,19 @@ const CoachSignup = () => {
     }
     return age;
   };
-
-  let handleRegister = (e) => {
-    e.preventDefault();
-    setState(false);
-    var age = getAge(inputs.dateOfBirth);
-    if (inputs.name.length < 3 || inputs.name.length > 50) {
-      setState((val) => ({ ...val, nameFlag: true }));
-    } else if (inputs.password.length < 5 || inputs.password.length > 10) {
-      setState((val) => ({ ...val, passFlag: true }));
-    } else if (inputs.mobileNumber.length !== 10) {
-      setState((val) => ({ ...val, mobileFlag: true }));
-    } else if (inputs.speciality.length < 10 || inputs.speciality.length > 50) {
-      setState((val) => ({ ...val, specFlag: true }));
-    } else if (age < 20 || age > 100) {
-      setState((val) => ({ ...val, ageFlag: true }));
-    } else {
-      const newCoach = inputs;
-      axios
-        .post("http://localhost:5000/coaches", newCoach, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-        .then((res) => {
-          setSuccess(true);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    }
-  };
-
   return (
     <>
-      {/* <h1>Coach Signup</h1> */}
-      {success ? (
-        <div className="text-center my-5">
+      {Object.keys(formErrors).length === 0 && isSubmit ? (
+        <div className="text-center bg-dark text-white my-5 p-4">
           <img src={coachicon} alt="coach" />
-          <h2>You are a coach now</h2>
-          <h4>Your Coach ID is {id}</h4>
-          <button onClick={() => navigate("/coachlogin")}>Login Now</button>
+          <h2>You are a coach now </h2>
+          <h4>Your Coach ID is {cId.coachId}</h4>
+          <button
+            className="btn btn-success"
+            onClick={() => navigate("/coachlogin")}
+          >
+            Login Now
+          </button>
         </div>
       ) : (
         <div
@@ -97,7 +108,7 @@ const CoachSignup = () => {
               <img src={coachicon} alr="Coach" className="mx-3" />
               <span style={{ fontSize: "25px" }}>Life Coach Profile</span>
             </div>
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className="row g-3">
                 <div className="col-md-6">
                   <label htmlFor="name" className="form-label">
@@ -107,14 +118,11 @@ const CoachSignup = () => {
                     type="text"
                     className="form-control"
                     name="name"
-                    value={inputs.name}
+                    value={formValues.name}
                     onChange={handleChange}
                   />
-                  {state.nameFlag ? (
-                    <span>Name should be have 3 to 50 character</span>
-                  ) : null}
+                  <p className="text-danger">{formErrors.name}</p>
                 </div>
-
                 <div className="col-md-6">
                   <label htmlFor="password" className="form-label">
                     Password
@@ -123,81 +131,69 @@ const CoachSignup = () => {
                     type="password"
                     className="form-control"
                     name="password"
-                    value={inputs.password}
+                    value={formValues.password}
                     onChange={handleChange}
                   />
-                  {state.passFlag ? (
-                    <span>Password should be have 5 to 10 character</span>
-                  ) : null}
+                  <p className="text-danger">{formErrors.password}</p>
                 </div>
-
                 <div className="col-md-6">
-                  <label htmlFor="date" className="form-label">
+                  <label htmlFor="dateOfBirth" className="form-label">
                     Date of Birth
                   </label>
                   <input
                     type="Date"
                     className="form-control"
                     name="dateOfBirth"
-                    value={inputs.dateOfBirth}
+                    value={formValues.dateOfBirth}
                     onChange={handleChange}
                   />
-                  {state.ageFlag ? (
-                    <span>Age should be have 20 to 100 character</span>
-                  ) : null}
+                  <p className="text-danger">{formErrors.dateOfBirth}</p>
                 </div>
-
                 <div className="col-md-6">
-                  <label htmlFor="gender" className="form-label">
+                  <p htmlFor="gender" className="form-label">
                     Gender
-                  </label>
-                  <div onChange={handleChange}>
-                    <div className="form-check form-check-inline">
-                      <input
-                        type="radio"
-                        className="form-check-input"
-                        name="gender"
-                        id="male"
-                        value="M"
-                        required
-                      />
-                      <label htmlFor="male" className="form-label">
-                        Male
-                      </label>
-                    </div>
-                    <div className="form-check form-check-inline">
-                      <input
-                        type="radio"
-                        className="form-check-input"
-                        name="gender"
-                        id="female"
-                        value="F"
-                        required
-                      />
-                      <label htmlFor="female" className="form-label">
-                        Female
-                      </label>
-                    </div>
+                  </p>
+                  <div className="form-check form-check-inline">
+                    <input
+                      type="radio"
+                      className="form-check-input"
+                      name="gender"
+                      id="male"
+                      value="M"
+                      onChange={handleChange}
+                    />
+                    <label htmlFor="male" className="form-label">
+                      Male
+                    </label>
                   </div>
+                  <div className="form-check form-check-inline">
+                    <input
+                      type="radio"
+                      className="form-check-input"
+                      name="gender"
+                      id="female"
+                      value="F"
+                      onChange={handleChange}
+                    />
+                    <label htmlFor="female" className="form-label">
+                      Female
+                    </label>
+                  </div>
+                  <p className="text-danger">{formErrors.gender}</p>
                 </div>
-
                 <div className="col-md-6">
-                  <label htmlFor="mobilenumber" className="form-label">
+                  <label htmlFor="mobileNumber" className="form-label">
                     Mobile Number
                   </label>
                   <input
                     type="text"
                     className="form-control"
                     name="mobileNumber"
-                    value={inputs.mobileNumber}
+                    value={formValues.mobileNumber}
                     onChange={handleChange}
                   />
-
-                  {state.mobileFlag ? (
-                    <span>Mobile Number should have 10 digit</span>
-                  ) : null}
+                  <p className="text-danger">{formErrors.mobileNumber}</p>
                 </div>
-
                 <div className="col-md-6">
                   <label htmlFor="speciality" className="form-label">
                     Speaciality
@@ -206,19 +202,13 @@ const CoachSignup = () => {
                     type="text"
                     className="form-control"
                     name="speciality"
-                    value={inputs.speciality}
+                    value={formValues.speciality}
                     onChange={handleChange}
                   />
-
-                  {state.specFlag ? (
-                    <span>speciality should be have 10 to 50 character</span>
-                  ) : null}
+                  <p className="text-danger">{formErrors.mobileNumber}</p>
                 </div>
-
                 <div className="text-center d-grid col-6 mx-auto py-3">
-                  <button onClick={handleRegister} className="btn btn-primary">
-                    Register
-                  </button>
+                  <button className="btn btn-primary">Register</button>
                 </div>
               </div>
             </form>

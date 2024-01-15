@@ -4,20 +4,18 @@ import { useParams } from "react-router-dom";
 
 export default function CoachHome() {
   let params = useParams();
-  let success;
-  const [data, setData] = useState("");
+  const [success, setSuccess] = useState(false);
   useEffect(() => {
-    setData(localStorage.getItem("id"));
     axios
       .get(`http://localhost:5000/coaches/booking/${params.id}`)
       .then((res) => {
         if (res.status == 200) {
-          success = true;
+          setSuccess(true);
         } else {
-          success = false;
+          setSuccess(false);
         }
       });
-  }, [data]);
+  }, [params.id]);
   return (
     <>
       {success ? (

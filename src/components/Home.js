@@ -30,16 +30,15 @@ const Home = () => {
         <div className="container px-4 mt-3">
           <div className="row gx-5">
             <div className="col">
-              <div className="p-3 border bg-light">
+              <div className="p-3 border bg-dark">
                 <img src={coachicon} alt="coach" />
                 <div>
-                  <button className="btn btn-primary" onClick={coachlogin}>
+                  <button className="btn btn-primary mt-2" onClick={coachlogin}>
                     Login as a coach
                   </button>
                   <br />
-                  <br />
                   <button
-                    className="btn btn-primary"
+                    className="btn btn-primary mt-2"
                     onClick={coachsignup}
                     type="submit"
                   >
@@ -49,15 +48,14 @@ const Home = () => {
               </div>
             </div>
             <div className="col">
-              <div className="p-3 border bg-light">
+              <div className="p-3 border bg-dark">
                 <img src={usericon} alt="user" />
                 <div>
-                  <button className="btn btn-primary" onClick={userlogin}>
+                  <button className="btn btn-primary mt-2" onClick={userlogin}>
                     Login as a user
                   </button>
                   <br />
-                  <br />
-                  <button className="btn btn-primary" onClick={usersignup}>
+                  <button className="btn btn-primary mt-2" onClick={usersignup}>
                     Signup as a user
                   </button>
                 </div>

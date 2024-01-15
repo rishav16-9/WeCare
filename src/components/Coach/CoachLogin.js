@@ -1,41 +1,47 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import coachicon from "../../images/coach_icon.png";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../Navbar";
 const CoachLogin = () => {
   let navigate = useNavigate();
-  const [id, setId] = useState("");
-  const [pwd, setPwd] = useState("");
-  const [message, setMessage] = useState("");
-  const [idflag, setIdFlag] = useState(false);
-  const [passflag, setPassFlag] = useState(false);
-  const [state, setState] = useState(false);
-
-  const hadleIdChange = (e) => {
-    setId(e.target.value);
+  const credential = { id: "", password: "" };
+  const [formValues, setFormValues] = useState(credential);
+  const [formErrors, setFormErrors] = useState({});
+  const [isSubmit, setIsSubmit] = useState(false);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues({ ...formValues, [name]: value });
   };
-  const hadlePassChange = (e) => {
-    setPwd(e.target.value);
+
+  useEffect(() => {
+    if (Object.keys(formErrors).length === 0 && isSubmit) {
+    }
+  }, [formValues]);
+
+  const validate = (values) => {
+    const errors = {};
+    if (!values.id || !values.password) {
+      errors.common = "Invalid Credential";
+    }
+    return errors;
   };
   const handleLogin = (e) => {
     e.preventDefault();
-    setState(false);
-    if (id.length === 0) {
-      setIdFlag(true);
-    } else if (pwd.length < 5 || pwd.length > 10) {
-      setPassFlag(true);
-    } else {
-      axios
-        .post(
-          `http://localhost:5000/coaches/login?coachId=${id}&password=${pwd}`
-        )
-        .then((res) => {
-          localStorage.setItem("id", id);
-          navigate("/coachhome/" + id);
-        });
-    }
+    setFormErrors(validate(formValues));
+
+    axios
+      .post(
+        `http://localhost:5000/coaches/login?coachId=${formValues.id}&password=${formValues.password}`
+      )
+      .then((res) => {
+        localStorage.setItem("id", formValues.id);
+        setIsSubmit(true);
+        navigate("/coachhome/" + formValues.id);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   };
   return (
     <>
@@ -49,29 +55,28 @@ const CoachLogin = () => {
                 style={{ width: "100%" }}
                 type="text"
                 className="form-control"
-                onChange={hadleIdChange}
+                onChange={handleChange}
                 placeholder="Coach Id"
+                name="id"
+                value={formValues.id}
               />
               <br />
               <input
                 style={{ width: "100%" }}
                 type="password"
                 className="form-control"
-                onChange={hadlePassChange}
+                onChange={handleChange}
                 placeholder="Password"
+                name="password"
+                value={formValues.password}
               />
-              <br />
-              <span className="text-danger">{message}</span>
+              <span className="text-danger">{formErrors.common}</span>
+              <div className="d-flex justify-content-center mt-2">
+                <button type="submit" className="btn btn-primary">
+                  Login
+                </button>
+              </div>
             </form>
-            <div className="d-flex justify-content-center">
-              <button
-                type="submit"
-                className="btn btn-primary"
-                onClick={handleLogin}
-              >
-                Login
-              </button>
-            </div>
           </div>
         </div>
       </div>

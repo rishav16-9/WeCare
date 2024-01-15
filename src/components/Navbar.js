@@ -1,33 +1,17 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PhoneIcon from "@mui/icons-material/Phone";
 import { Logout } from "@mui/icons-material";
 import AccountBoxOutlinedIcon from "@mui/icons-material/AccountBoxOutlined";
 import TodayOutlinedIcon from "@mui/icons-material/TodayOutlined";
-import { useEffect, useState } from "react";
 
 const Navbar = () => {
-  const [user, setUser] = useState(false);
-  const [coach, setCoach] = useState(false);
-  const [data, setData] = useState("");
-  useEffect(() => {
-    setData(localStorage.getItem("id"));
-    if (data === null) {
-      setCoach(false);
-      setUser(false);
-    } else if (data.match(/^([a-zA-Z]+)-/)?.[1] === "CI") {
-      setCoach(true);
-      setUser(false);
-      console.log(coach);
-    } else if (data.match(/^([a-zA-Z]+)-/)?.[1] === "UI") {
-      setCoach(false);
-      setUser(true);
-    } else {
-      setCoach(false);
-      setUser(false);
-    }
-  }, [data]);
-
+  let navigate = useNavigate();
+  const id = localStorage.getItem("id");
+  const handleLogout = () => {
+    localStorage.removeItem("id");
+    navigate("/coachlogin");
+  };
   return (
     <>
       {/* <nav className="navbar navbar-expand-lg bg-black text-white">
@@ -44,27 +28,27 @@ const Navbar = () => {
             </Link>
           </div>
           <div className="d-flex" style={{ gap: "15px" }}>
-            {coach === true ? (
+            {id?.match(/^([a-zA-Z]+)-/)?.[1] === "CI" ? (
               <div>
                 <Link className="navbar-brand text-white" to="/CoachProfile">
                   <AccountBoxOutlinedIcon fontSize="small" />
                   View Profile
                 </Link>
               </div>
-            ) : user === true ? (
+            ) : id?.match(/^([a-zA-Z]+)-/)?.[1] === "UI" ? (
               <Link className="navbar-brand text-white" to="/CoachProfile">
                 <AccountBoxOutlinedIcon fontSize="small" />
                 View Profile
               </Link>
             ) : null}
-            {coach === true ? (
+            {id?.match(/^([a-zA-Z]+)-/)?.[1] === "CI" ? (
               <Link className="navbar-brand text-white" to="/myschedule">
                 <div>
                   <TodayOutlinedIcon fontSize="small" />
                   My Schedule
                 </div>
               </Link>
-            ) : user === true ? (
+            ) : id?.match(/^([a-zA-Z]+)-/)?.[1] === "UI" ? (
               <Link className="navbar-brand text-white" to="/myappointment">
                 <div>
                   <AccountBoxOutlinedIcon fontSize="small" />
@@ -76,8 +60,9 @@ const Navbar = () => {
               <PhoneIcon fontSize="small" />
               Call Us: 080 2233447
             </div>
-            {user === true || coach === true ? (
-              <div>
+            {id?.match(/^([a-zA-Z]+)-/)?.[1] === "UI" ||
+            id?.match(/^([a-zA-Z]+)-/)?.[1] === "CI" ? (
+              <div role="button" className="text-white" onClick={handleLogout}>
                 <Logout fontSize="small" />
                 Logout
               </div>
