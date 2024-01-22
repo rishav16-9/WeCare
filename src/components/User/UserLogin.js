@@ -3,38 +3,47 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
 import usericon from "../../images/user_icon.png";
+import validate from "./validateuser";
 
 const UserLogin = () => {
   let navigate = useNavigate();
-  const [id, setId] = useState("");
-  const [pwd, setPwd] = useState("");
-  const [message, setMessage] = useState("");
-  const [idflag, setIdFlag] = useState(false);
-  const [passflag, setPassFlag] = useState(false);
-  const [state, setState] = useState(false);
+  const credential = { id: "", password: "" };
+  const [formData, setFormData] = useState(credential);
+  const [formError, setFormError] = useState(credential);
+  const [isSubmit, setIsSubmit] = useState(false);
+  const hadleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    const error = validate(name, value);
+    setFormError({ ...formError, [name]: error });
+  };
 
-  const hadleIdChange = (e) => {
-    setId(e.target.value);
-  };
-  const hadlePassChange = (e) => {
-    setPwd(e.target.value);
-  };
   const handleLogin = (e) => {
     e.preventDefault();
-    setState(false);
-    if (id.length === 0) {
-      setIdFlag(true);
-    } else if (pwd.length < 5 || pwd.length > 10) {
-      setPassFlag(true);
+    var newFormError = {};
+    Object.keys(formData).forEach((fieldName) => {
+      newFormError[fieldName] = validate(fieldName, formData[fieldName]);
+    });
+    setFormError(newFormError);
+    if (Object.values(formData).some((error) => error)) {
+      setIsSubmit(false);
+      return;
     } else {
       axios
-        .get("http://localhost:4000/users?id=" + id + "&password" + pwd)
+        .post(
+          `http://localhost:5000/users/login?userId=${formData.id}&password=${formData.password}`
+        )
         .then((res) => {
-          if (res.data.length === 0) {
-            setState(true);
-          } else {
-            navigate("/userhome");
+          localStorage.setItem("id", formData.id);
+          setIsSubmit(true);
+          if (isSubmit && res.status === 200) {
+            navigate("/userhome/" + formData.id);
+            setFormData(credential);
+            setFormError({});
           }
+        })
+        .catch((error) => {
+          setIsSubmit(false);
         });
     }
   };
@@ -50,29 +59,34 @@ const UserLogin = () => {
                 style={{ width: "100%" }}
                 type="text"
                 className="form-control"
-                onChange={hadleIdChange}
+                name="id"
+                onChange={hadleChange}
                 placeholder="User Id"
+                value={formData.id}
               />
+              {formError.id && (
+                <span className="text-danger">{formError.id}</span>
+              )}
               <br />
               <input
                 style={{ width: "100%" }}
                 type="password"
                 className="form-control"
-                onChange={hadlePassChange}
+                onChange={hadleChange}
+                name="password"
                 placeholder="Password"
+                value={formData.password}
               />
+              {formError.password && (
+                <span className="text-danger">{formError.password}</span>
+              )}
               <br />
-              <span className="text-danger">{message}</span>
+              <div className="d-flex justify-content-center">
+                <button type="submit" className="btn btn-primary">
+                  Login
+                </button>
+              </div>
             </form>
-            <div className="d-flex justify-content-center">
-              <button
-                type="submit"
-                className="btn btn-primary"
-                onClick={handleLogin}
-              >
-                Login
-              </button>
-            </div>
           </div>
         </div>
       </div>

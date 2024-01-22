@@ -1,11 +1,13 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import coachicon from "../../images/coach_icon.png";
+import validate from "./Validate";
 
 const CoachSignup = () => {
   let navigate = useNavigate();
+
   const initialValue = {
     name: "",
     password: "",
@@ -14,89 +16,70 @@ const CoachSignup = () => {
     mobileNumber: "",
     speciality: "",
   };
-  const [formValues, setFormValues] = useState(initialValue);
-  const [formErrors, setFormErrors] = useState({});
+  const [formData, setFormData] = useState(initialValue);
+  const [formErrors, setFormErrors] = useState(initialValue);
   const [isSubmit, setIsSubmit] = useState(false);
+
   const [cId, setCId] = useState("");
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormValues({ ...formValues, [name]: value });
+    const { name, value, type } = e.target;
+    var fieldValue;
+    if (type === "radio") {
+      fieldValue = value;
+    } else {
+      fieldValue = value;
+    }
+    setFormData({ ...formData, [name]: fieldValue });
+    const error = validate(name, fieldValue);
+    setFormErrors({ ...formErrors, [name]: error });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setFormErrors(validate(formValues));
-    const newCoach = formValues;
-    axios
-      .post("http://localhost:5000/coaches", newCoach, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((res) => {
-        setCId(res.data.message);
-        setIsSubmit(true);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+    const newFormError = {};
+    Object.keys(formData).forEach((fieldName) => {
+      newFormError[fieldName] = validate(fieldName, formData[fieldName]);
+    });
+    setFormErrors(newFormError);
+    if (Object.values(newFormError).some((error) => error)) {
+      setIsSubmit(false);
+      return;
+    } else {
+      const newCoach = formData;
+      axios
+        .post("http://localhost:5000/coaches", newCoach, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        .then((res) => {
+          setIsSubmit(true);
+          setCId(res.data.message);
+          setFormData(initialValue);
+          setFormErrors({});
+        })
+        .catch((e) => {
+          setIsSubmit(false);
+        });
+    }
   };
 
-  useEffect(() => {
-    if (Object.keys(formErrors).length === 0 && isSubmit) {
-    }
-  }, [formValues]);
-
-  const validate = (values) => {
-    const errors = {};
-    if (!values.name) {
-      errors.name = "Name is required";
-    }
-    if (!values.password) {
-      errors.password = "Password is required";
-    }
-    if (!values.dateOfBirth) {
-      errors.dateOfBirth = "Date of birth is required";
-    }
-    if (getAge(values.dateOfBirth) < 18 || getAge(values.dateOfBirth) > 100) {
-      errors.dateOfBirth = "To register must be greater than 18";
-    }
-    if (!values.gender) {
-      errors.gender = "Gender is required";
-    }
-    if (!values.mobileNumber) {
-      errors.mobileNumber = "Mobile number is required";
-    }
-    if (!values.speciality) {
-      errors.speciality = "Speciality is required";
-    }
-    return errors;
-  };
-
-  let getAge = (dateString) => {
-    var today = new Date();
-    var birthDate = new Date(dateString);
-    var age = today.getFullYear() - birthDate.getFullYear();
-    var m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age;
-  };
   return (
     <>
-      {Object.keys(formErrors).length === 0 && isSubmit ? (
-        <div className="text-center bg-dark text-white my-5 p-4">
-          <img src={coachicon} alt="coach" />
-          <h2>You are a coach now </h2>
-          <h4>Your Coach ID is {cId.coachId}</h4>
-          <button
-            className="btn btn-success"
-            onClick={() => navigate("/coachlogin")}
-          >
-            Login Now
-          </button>
+      {isSubmit ? (
+        <div className="d-flex justify-content-center">
+          <div className="text-center bg-dark text-white w-50 my-5 p-4">
+            <img src={coachicon} alt="coach" />
+            <h2>You are a coach now </h2>
+            <h4>Your Coach ID is {cId.coachId}</h4>
+            <button
+              className="btn btn-success"
+              onClick={() => navigate("/coachlogin")}
+            >
+              Login Now
+            </button>
+          </div>
         </div>
       ) : (
         <div
@@ -105,7 +88,7 @@ const CoachSignup = () => {
         >
           <div className="card-body my-3">
             <div className="card-title text-center">
-              <img src={coachicon} alr="Coach" className="mx-3" />
+              <img src={coachicon} alt="Coach" className="mx-3" />
               <span style={{ fontSize: "25px" }}>Life Coach Profile</span>
             </div>
             <form onSubmit={handleSubmit}>
@@ -118,10 +101,12 @@ const CoachSignup = () => {
                     type="text"
                     className="form-control"
                     name="name"
-                    value={formValues.name}
+                    value={formData.name}
                     onChange={handleChange}
                   />
-                  <p className="text-danger">{formErrors.name}</p>
+                  {formErrors.name && (
+                    <span className="text-danger">{formErrors.name}</span>
+                  )}
                 </div>
                 <div className="col-md-6">
                   <label htmlFor="password" className="form-label">
@@ -131,10 +116,12 @@ const CoachSignup = () => {
                     type="password"
                     className="form-control"
                     name="password"
-                    value={formValues.password}
+                    value={formData.password}
                     onChange={handleChange}
                   />
-                  <p className="text-danger">{formErrors.password}</p>
+                  {formErrors.password && (
+                    <span className="text-danger">{formErrors.password}</span>
+                  )}
                 </div>
                 <div className="col-md-6">
                   <label htmlFor="dateOfBirth" className="form-label">
@@ -144,15 +131,17 @@ const CoachSignup = () => {
                     type="Date"
                     className="form-control"
                     name="dateOfBirth"
-                    value={formValues.dateOfBirth}
+                    value={formData.dateOfBirth}
                     onChange={handleChange}
                   />
-                  <p className="text-danger">{formErrors.dateOfBirth}</p>
+                  {formErrors.dateOfBirth && (
+                    <span className="text-danger">
+                      {formErrors.dateOfBirth}
+                    </span>
+                  )}
                 </div>
                 <div className="col-md-6">
-                  <p htmlFor="gender" className="form-label">
-                    Gender
-                  </p>
+                  <p className="form-label">Gender</p>
                   <div className="form-check form-check-inline">
                     <input
                       type="radio"
@@ -160,6 +149,7 @@ const CoachSignup = () => {
                       name="gender"
                       id="male"
                       value="M"
+                      checked={formData.gender === "M"}
                       onChange={handleChange}
                     />
                     <label htmlFor="male" className="form-label">
@@ -173,13 +163,16 @@ const CoachSignup = () => {
                       name="gender"
                       id="female"
                       value="F"
+                      checked={formData.gender === "F"}
                       onChange={handleChange}
                     />
                     <label htmlFor="female" className="form-label">
                       Female
                     </label>
                   </div>
-                  <p className="text-danger">{formErrors.gender}</p>
+                  {formErrors.gender && (
+                    <span className="text-danger">{formErrors.gender}</span>
+                  )}
                 </div>
                 <div className="col-md-6">
                   <label htmlFor="mobileNumber" className="form-label">
@@ -189,10 +182,14 @@ const CoachSignup = () => {
                     type="text"
                     className="form-control"
                     name="mobileNumber"
-                    value={formValues.mobileNumber}
+                    value={formData.mobileNumber}
                     onChange={handleChange}
                   />
-                  <p className="text-danger">{formErrors.mobileNumber}</p>
+                  {formErrors.mobileNumber && (
+                    <span className="text-danger">
+                      {formErrors.mobileNumber}
+                    </span>
+                  )}
                 </div>
                 <div className="col-md-6">
                   <label htmlFor="speciality" className="form-label">
@@ -202,10 +199,12 @@ const CoachSignup = () => {
                     type="text"
                     className="form-control"
                     name="speciality"
-                    value={formValues.speciality}
+                    value={formData.speciality}
                     onChange={handleChange}
                   />
-                  <p className="text-danger">{formErrors.mobileNumber}</p>
+                  {formErrors.speciality && (
+                    <span className="text-danger">{formErrors.speciality}</span>
+                  )}
                 </div>
                 <div className="text-center d-grid col-6 mx-auto py-3">
                   <button className="btn btn-primary">Register</button>

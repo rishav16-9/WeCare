@@ -10,7 +10,7 @@ const Navbar = () => {
   const id = localStorage.getItem("id");
   const handleLogout = () => {
     localStorage.removeItem("id");
-    navigate("/coachlogin");
+    navigate("/");
   };
   return (
     <>

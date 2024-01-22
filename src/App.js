@@ -26,7 +26,7 @@ const App = () => {
           <Route path="coachprofile" element={<CoachProfile />} />
           <Route path="usersignup" element={<UserSignup />} />
           <Route path="userlogin" element={<UserLogin />} />
-          <Route path="userhome" element={<UserHome />} />
+          <Route path="userhome/:id/*" element={<UserHome />} />
           <Route />
         </Routes>
         <Footer />

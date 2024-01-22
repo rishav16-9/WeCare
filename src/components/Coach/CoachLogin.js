@@ -1,47 +1,53 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import coachicon from "../../images/coach_icon.png";
 import { useNavigate } from "react-router-dom";
+import validate from "./Validate";
+
 const CoachLogin = () => {
   let navigate = useNavigate();
   const credential = { id: "", password: "" };
-  const [formValues, setFormValues] = useState(credential);
+  const [formData, setFormData] = useState(credential);
   const [formErrors, setFormErrors] = useState({});
   const [isSubmit, setIsSubmit] = useState(false);
+
   const handleChange = (e) => {
+    var fieldValue;
     const { name, value } = e.target;
-    setFormValues({ ...formValues, [name]: value });
+    fieldValue = value;
+    setFormData({ ...formData, [name]: fieldValue });
+    const error = validate(name, fieldValue);
+    setFormErrors({ ...formErrors, [name]: error });
   };
 
-  useEffect(() => {
-    if (Object.keys(formErrors).length === 0 && isSubmit) {
-    }
-  }, [formValues]);
-
-  const validate = (values) => {
-    const errors = {};
-    if (!values.id || !values.password) {
-      errors.common = "Invalid Credential";
-    }
-    return errors;
-  };
   const handleLogin = (e) => {
     e.preventDefault();
-    setFormErrors(validate(formValues));
-
-    axios
-      .post(
-        `http://localhost:5000/coaches/login?coachId=${formValues.id}&password=${formValues.password}`
-      )
-      .then((res) => {
-        localStorage.setItem("id", formValues.id);
-        setIsSubmit(true);
-        navigate("/coachhome/" + formValues.id);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+    const newFormError = {};
+    Object.keys(formData).forEach((fieldName) => {
+      newFormError[fieldName] = validate(fieldName, formData[fieldName]);
+    });
+    setFormErrors(newFormError);
+    if (Object.values(formData).some((error) => error)) {
+      setIsSubmit(false);
+    } else {
+      axios
+        .post(
+          `http://localhost:5000/coaches/login?coachId=${formData.id}&password=${formData.password}`
+        )
+        .then((res) => {
+          localStorage.setItem("id", formData.id);
+          setIsSubmit(true);
+          if (isSubmit && res.status === 200) {
+            navigate("/coachhome/" + formData.id);
+            setFormData(credential);
+            setFormErrors({});
+          }
+        })
+        .catch((e) => {
+          setIsSubmit(false);
+        });
+    }
   };
   return (
     <>
@@ -58,7 +64,7 @@ const CoachLogin = () => {
                 onChange={handleChange}
                 placeholder="Coach Id"
                 name="id"
-                value={formValues.id}
+                value={formData.id}
               />
               <br />
               <input
@@ -68,7 +74,7 @@ const CoachLogin = () => {
                 onChange={handleChange}
                 placeholder="Password"
                 name="password"
-                value={formValues.password}
+                value={formData.password}
               />
               <span className="text-danger">{formErrors.common}</span>
               <div className="d-flex justify-content-center mt-2">
