@@ -25,7 +25,7 @@ const UserLogin = () => {
       newFormError[fieldName] = validate(fieldName, formData[fieldName]);
     });
     setFormError(newFormError);
-    if (Object.values(formData).some((error) => error)) {
+    if (Object.values(newFormError).some((error) => error)) {
       setIsSubmit(false);
       return;
     } else {
@@ -36,7 +36,7 @@ const UserLogin = () => {
         .then((res) => {
           localStorage.setItem("id", formData.id);
           setIsSubmit(true);
-          if (isSubmit && res.status === 200) {
+          if (isSubmit && res.status === 201) {
             navigate("/userhome/" + formData.id);
             setFormData(credential);
             setFormError({});

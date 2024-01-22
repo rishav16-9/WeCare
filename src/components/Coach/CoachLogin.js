@@ -28,8 +28,7 @@ const CoachLogin = () => {
       newFormError[fieldName] = validate(fieldName, formData[fieldName]);
     });
     setFormErrors(newFormError);
-    if (Object.values(formData).some((error) => error)) {
-      setIsSubmit(false);
+    if (Object.values(newFormError).some((error) => error)) {
     } else {
       axios
         .post(
