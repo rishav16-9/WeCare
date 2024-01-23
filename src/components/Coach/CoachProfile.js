@@ -1,7 +1,22 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import coachicon from "../../images/coach_icon.png";
+import axios from "axios";
+import { useParams } from "react-router-dom";
 
 const CoachProfile = () => {
+  const [coachDetail, setCoachDetail] = useState({});
+  let param = useParams();
+  useEffect(() => {
+    axios
+      .get(`http://localhost:5000/coaches/${param.id}`)
+      .then((res) => {
+        setCoachDetail(res.data.coach);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }, [param]);
+
   return (
     <>
       <div
@@ -22,10 +37,10 @@ const CoachProfile = () => {
               />
             </div>
             <div>
-              <h4>Coach Id:1</h4>
-              <h6>Date of birth:1/1/1996</h6>
-              <h6>mobile number:1234567890</h6>
-              <h6>Speciality:Lorem ipsum</h6>
+              <h4>Coach Id: {coachDetail.coachId}</h4>
+              <h6>Date of birth: {coachDetail.dateOfBirth}</h6>
+              <h6>mobile number: {coachDetail.mobileNumber}</h6>
+              <h6>Speciality: {coachDetail.speciality}</h6>
             </div>
           </div>
         </div>

@@ -30,7 +30,10 @@ const Navbar = () => {
           <div className="d-flex" style={{ gap: "15px" }}>
             {id?.match(/^([a-zA-Z]+)-/)?.[1] === "CI" ? (
               <div>
-                <Link className="navbar-brand text-white" to="/CoachProfile">
+                <Link
+                  className="navbar-brand text-white"
+                  to={`/CoachProfile/${id}`}
+                >
                   <AccountBoxOutlinedIcon fontSize="small" />
                   View Profile
                 </Link>
