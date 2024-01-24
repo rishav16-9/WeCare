@@ -9,6 +9,7 @@ import UserHome from "./components/User/UserHome";
 import Footer from "./components/Footer";
 import CoachProfile from "./components/Coach/CoachProfile";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import UserProfile from "./components/User/UserProfile";
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
           <Route path="usersignup" element={<UserSignup />} />
           <Route path="userlogin" element={<UserLogin />} />
           <Route path="userhome/:id/*" element={<UserHome />} />
+          <Route path="userviewprofile/:id/*" element={<UserProfile />} />
           <Route />
         </Routes>
         <Footer />

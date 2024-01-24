@@ -32,14 +32,17 @@ const Navbar = () => {
               <div>
                 <Link
                   className="navbar-brand text-white"
-                  to={`/CoachProfile/${id}`}
+                  to={`/coachprofile/${id}`}
                 >
                   <AccountBoxOutlinedIcon fontSize="small" />
                   View Profile
                 </Link>
               </div>
             ) : id?.match(/^([a-zA-Z]+)-/)?.[1] === "UI" ? (
-              <Link className="navbar-brand text-white" to="/CoachProfile">
+              <Link
+                className="navbar-brand text-white"
+                to={`/userviewprofile/${id}`}
+              >
                 <AccountBoxOutlinedIcon fontSize="small" />
                 View Profile
               </Link>

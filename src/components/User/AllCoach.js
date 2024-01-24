@@ -3,10 +3,14 @@ import coachicon from "../../images/coach_icon.png";
 
 const AllCoach = ({ coach }) => {
   return (
-    <div className="d-flex flex-wrap justify-content-around ">
+    <div className="d-flex flex-wrap justify-content-between">
       {coach.map((item) => (
-        <div key={item._id} className="card bg-black card-body m-2">
-          <div className="d-flex">
+        <div
+          key={item._id}
+          className="card bg-black card-body m-2"
+          style={{ width: "21rem" }}
+        >
+          <div className="d-flex" style={{ gap: "2.25rem" }}>
             <div>
               <img
                 src={coachicon}
