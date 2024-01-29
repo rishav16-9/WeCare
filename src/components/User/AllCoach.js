@@ -1,7 +1,7 @@
 import React from "react";
 import coachicon from "../../images/coach_icon.png";
 
-const AllCoach = ({ coach }) => {
+const AllCoach = ({ coach, setAppointment }) => {
   return (
     <div className="d-flex flex-wrap justify-content-between">
       {coach.map((item) => (
@@ -24,7 +24,14 @@ const AllCoach = ({ coach }) => {
               <h5>Coach Id: {item.coachId}</h5>
               <h6>Mobile Number: {item.mobileNumber}</h6>
               <h6>Speciality: {item.speciality}</h6>
-              <button className="btn btn-success">Book an Appointment</button>
+              <button
+                className="btn btn-success"
+                onClick={() => {
+                  setAppointment(item);
+                }}
+              >
+                Book an Appointment
+              </button>
             </div>
           </div>
         </div>

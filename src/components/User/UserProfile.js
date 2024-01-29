@@ -17,7 +17,7 @@ const UserProfile = () => {
       .catch((error) => {
         console.log(error);
       });
-  }, [param]);
+  }, [param, userDetail]);
 
   return (
     <div>

@@ -9,7 +9,7 @@ export default function CoachHome() {
     axios
       .get(`http://localhost:5000/coaches/booking/${params.id}`)
       .then((res) => {
-        if (res.status == 200) {
+        if (res.status === 200) {
           setSuccess(true);
         } else {
           setSuccess(false);
